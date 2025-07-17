@@ -1,45 +1,68 @@
 #!/usr/bin/env python3
 """
-Generate docs/index.html from data/results.csv (GitHub-Pages leaderboard).
+Build docs/index.html from data/results.csv.
 
-CSV schema (example):
-Model,Earned (offline pass@1),Accuracy (offline pass@1),Submitter,Date
-4o,0.08081,11500,OpenAI,2025-07-17
-o1,0.27778,43625,OpenAI,2025-07-17
+* sorts by Earned (offline pass@1) descending
+* inserts a Rank column
+* renders templates/leaderboard.html.j2 via Jinja2
 """
 
-import pathlib, datetime, pandas as pd, jinja2, textwrap
+import datetime as _dt
+import pathlib as _p
+import pandas as _pd
+import jinja2 as _jinja
 
-ROOT       = pathlib.Path(__file__).resolve().parents[1]
-CSV_PATH   = ROOT / "data" / "results.csv"
-HTML_PATH  = ROOT / "docs" / "index.html"
 
-# Which metric decides the ranking?
-METRIC_COL = "Earned (offline pass@1)"
+# ——————————————————— configuration ———————————————————
+ROOT        = _p.Path(__file__).resolve().parent.parent
+CSV_PATH    = ROOT / "data" / "results.csv"
+HTML_OUT    = ROOT / "docs" / "index.html"
+TEMPLATE    = ROOT / "templates" / "leaderboard.html.j2"
+METRIC_COL  = "Earned (offline pass@1)"      # column that decides ranking
+# ————————————————————————————————————————————————————————
 
-# ------------------------------------------------------------------ load data
-df = pd.read_csv(CSV_PATH)
 
-# Make sure the metric column is numeric (strip commas etc. if needed)
-df[METRIC_COL] = pd.to_numeric(df[METRIC_COL], errors="coerce")
+def _load_data():
+    df = _pd.read_csv(CSV_PATH)
 
-# Rank: 1 = best (highest Earned)
-df = df.sort_values(METRIC_COL, ascending=False).reset_index(drop=True)
-df.insert(0, "Rank", df.index + 1)
+    # make sure metric column is numeric
+    df[METRIC_COL] = _pd.to_numeric(df[METRIC_COL], errors="coerce")
 
-# Pretty-print dates if present
-if "Date" in df.columns:
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.date
+    # order: best → worst
+    df = df.sort_values(METRIC_COL, ascending=False).reset_index(drop=True)
 
-# ---------------------------------------------------------------- render HTML
-env  = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(ROOT / "templates"), autoescape=True)
-html = env.get_template("leaderboard.html.j2").render(
+    # rank is 1-based
+    df.insert(0, "Rank", df.index + 1)
+
+    # prettier date column if present
+    if "Date" in df.columns:
+        df["Date"] = _pd.to_datetime(df["Date"], errors="coerce").dt.date
+
+    return df
+
+
+def _render(df):
+    env = _jinja.Environment(
+        loader=_jinja.FileSystemLoader(TEMPLATE.parent),
+        autoescape=True,
+    )
+    html = env.get_template(TEMPLATE.name).render(
         rows=df.to_dict(orient="records"),
-        generated=datetime.date.today().isoformat(),
-        description=textwrap.dedent("""
-            Read the README for info on how to submit. After adding the correct folder to `submissions`, open a PR, and CI will rebuild this page automatically.
-        """))
+        generated=_dt.date.today().isoformat(),
+        description=(
+            "Append a line to data/results.csv and open a PR – "
+            "this page rebuilds automatically on merge."
+        ),
+    )
+    HTML_OUT.parent.mkdir(parents=True, exist_ok=True)
+    HTML_OUT.write_text(html, encoding="utf-8")
+    print(f"✓ wrote {HTML_OUT.relative_to(ROOT)}")
 
-HTML_PATH.write_text(html, encoding="utf-8")
-print(f"✓ Wrote {HTML_PATH.relative_to(ROOT)}")
+
+def main():
+    df = _load_data()
+    _render(df)
+
+
+if __name__ == "__main__":
+    main()
