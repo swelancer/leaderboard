@@ -9,7 +9,7 @@ This repository contains **(a)** the SWE‑Lancer benchmark data, **(b)** an aut
 ```
 <repo‑root>/
 ├── data/                  # Ground‑truth data & aggregated results
-│   └── results.csv        # ← auto‑generated; DO NOT EDIT BY HAND
+│   └── results.csv        # ← generated from submission folder; DO NOT EDIT BY HAND
 ├── submissions/           # Community submissions land here (see §2)
 │   └── <DisplayName>/     # one folder per submission, name = what shows on LB
 │       └── <task‑id>/     # one folder per task, e.g. 25570_1192
