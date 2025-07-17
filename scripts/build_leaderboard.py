@@ -2,7 +2,7 @@
 """
 Build docs/index.html from data/results.csv.
 
-* sorts by Earned (offline pass@1) descending
+* sorts by Earned descending
 * inserts a Rank column
 * renders templates/leaderboard.html.j2 via Jinja2
 """
@@ -18,7 +18,7 @@ ROOT        = _p.Path(__file__).resolve().parent.parent
 CSV_PATH    = ROOT / "data" / "results.csv"
 HTML_OUT    = ROOT / "docs" / "index.html"
 TEMPLATE    = ROOT / "templates" / "leaderboard.html.j2"
-METRIC_COL  = "Earned (offline pass@1)"      # column that decides ranking
+METRIC_COL  = "Earned"      # column that decides ranking
 # ————————————————————————————————————————————————————————
 
 
@@ -50,8 +50,8 @@ def _render(df):
         rows=df.to_dict(orient="records"),
         generated=_dt.date.today().isoformat(),
         description=(
-            "Append a line to data/results.csv and open a PR – "
-            "this page rebuilds automatically on merge."
+            "Follow the README instructions for how to add a folder to submissions. We will verify your submission and update the leaderboard."
+            "\nImportant note: the leaderboard only contains tasks from the 198 diamond offline subset."
         ),
     )
     HTML_OUT.parent.mkdir(parents=True, exist_ok=True)
