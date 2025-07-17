@@ -1,14 +1,13 @@
-name: Build & Deploy Leaderboard
+name: Build & Commit Leaderboard
 
 on:
-  # rebuild the page only when the data or rendering code changes
   push:
     branches: [main]
     paths:
       - "data/results.csv"
       - "scripts/build_leaderboard.py"
       - "templates/**"
-  workflow_dispatch:        # manual re-build button in the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,16 +21,15 @@ jobs:
         python-version: "3.x"
         cache: pip
 
-    - run: pip install pandas jinja2
+    - name: Install deps
+      run: pip install -r requirements.txt
 
     - name: Build static HTML
       run: python3 scripts/build_leaderboard.py
 
-    # —— deploy ————————————————————————————————
-    # Keep this step if you selected **Branch: gh-pages** in
-    # Settings → Pages.  (Change publish_dir if you renamed /docs.)
-    - name: Publish to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
+    # Commit the freshly generated docs/ back to main
+    - name: Commit updated docs
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs
+        commit_message: "CI: rebuild leaderboard"
+        file_pattern: docs/index.html
