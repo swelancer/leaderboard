@@ -1,13 +1,14 @@
 name: Build & Deploy Leaderboard
 
 on:
+  # rebuild the page only when the data or rendering code changes
   push:
     branches: [main]
     paths:
-      - "data/results.csv"      # ← only rebuild when the CSV changes
+      - "data/results.csv"
       - "scripts/build_leaderboard.py"
       - "templates/**"
-  workflow_dispatch:            # manual re-build if ever needed
+  workflow_dispatch:        # manual re-build button in the Actions tab
 
 jobs:
   build:
@@ -15,17 +16,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup Python
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.x"
         cache: pip
 
     - run: pip install pandas jinja2
-    - run: python3 scripts/build_leaderboard.py
 
-    # If you deploy via gh-pages branch:
-    - name: Deploy to GitHub Pages
+    - name: Build static HTML
+      run: python3 scripts/build_leaderboard.py
+
+    # —— deploy ————————————————————————————————
+    # Keep this step if you selected **Branch: gh-pages** in
+    # Settings → Pages.  (Change publish_dir if you renamed /docs.)
+    - name: Publish to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
