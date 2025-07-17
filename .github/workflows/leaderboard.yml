@@ -1,5 +1,7 @@
 name: Build & Commit Leaderboard
 
+concurrency: leaderboard-build
+
 on:
   push:
     branches: [main]
