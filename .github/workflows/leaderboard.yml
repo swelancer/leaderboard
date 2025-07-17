@@ -1,0 +1,32 @@
+name: Build & Deploy Leaderboard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/results.csv"      # ← only rebuild when the CSV changes
+      - "scripts/build_leaderboard.py"
+      - "templates/**"
+  workflow_dispatch:            # manual re-build if ever needed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+        cache: pip
+
+    - run: pip install pandas jinja2
+    - run: python3 scripts/build_leaderboard.py
+
+    # If you deploy via gh-pages branch:
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs
