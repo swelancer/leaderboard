@@ -1,3 +1,4 @@
 Model,Earned,Accuracy,Submitter,Date
 4o,11500,0.08081,OpenAI,2025-07-17
-o1,45625,0.28426,OpenAI,2025-07-17dummy,0,0,Test,2025-07-17
+o1,45625,0.28426,OpenAI,2025-07-17
+dummy,0,0,Test,2025-07-17
