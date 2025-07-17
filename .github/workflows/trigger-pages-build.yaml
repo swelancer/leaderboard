@@ -1,0 +1,18 @@
+# .github/workflows/trigger-pages-build.yaml
+name: Trigger Pages Build
+
+on:
+  push:
+    paths:
+      - 'data/results.csv'
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger empty commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit --allow-empty -m "Trigger rebuild"
+          git push
