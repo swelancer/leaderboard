@@ -1,5 +1,7 @@
 # SWE‑Lancer Leaderboard
 
+Access the current leaderboard here[https://swelancer.github.io/leaderboard/]
+
 This repository contains **(a)** the SWE‑Lancer benchmark data, **(b)** an automated grading workflow, and **(c)** the public leaderboard served via GitHub Pages.
 
 ---
