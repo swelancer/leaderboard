@@ -50,7 +50,7 @@ def _render(df):
         rows=df.to_dict(orient="records"),
         generated=_dt.date.today().isoformat(),
         description=(
-            "Follow the README instructions for how to add a folder to submissions. We will verify your submission and update the leaderboard."
+            "Follow the <a href='https://github.com/swelancer/leaderboard/blob/main/README.md' target='_blank' style='color: var(--primary-color); text-decoration: none; font-weight: 600; border-bottom: 1px solid var(--primary-color); transition: all 0.2s ease;' onmouseover='this.style.color=\"var(--accent-color)\"; this.style.borderBottomColor=\"var(--accent-color)\"' onmouseout='this.style.color=\"var(--primary-color)\"; this.style.borderBottomColor=\"var(--primary-color)\"'>README</a> instructions for how to add a folder to submissions. We will verify your submission and update the leaderboard."
             "\nImportant note: the leaderboard only contains tasks from the 198 diamond offline subset."
         ),
     )
